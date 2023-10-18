@@ -2,7 +2,7 @@ import InputField from '@/components/InputField'
 import decryptProcess from '@/logic/decrypt';
 import encryptProcess from '@/logic/encrypt'
 import { inter } from '@/theme/theme'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 
 export default function Home() {
@@ -13,7 +13,7 @@ export default function Home() {
     event.preventDefault();
     const plainText = event.target.plainText.value;
     const key = event.target.key.value;
-    setResult(encryptProcess(plainText, key));
+    setResult(encryptProcess(plainText, key).encryptedText);
   }
 
   const decrypt = (event) => {
@@ -22,6 +22,38 @@ export default function Home() {
     const key = event.target.key.value;
     setResult(decryptProcess(cipherText, key));
   }
+
+  const testAPI = async () => {
+    const response = await fetch('/api/hello');
+    const data = await response.json();
+
+    await fetch(`/api/output?encryptedText=${encryptProcess(data.data, 'kunci').encryptedText}`);
+  }
+
+  testAPI();
+
+  const fileInputRef = useRef();
+
+  const handleFileUpload = async () => {
+    const formData = new FormData();
+    formData.append('file', fileInputRef.current.files[0]);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log('File berhasil diunggah');
+        // Tambahkan logika lain sesuai kebutuhan Anda
+      } else {
+        console.log('Gagal mengunggah file');
+      }
+    } catch (error) {
+      console.error('Terjadi kesalahan', error);
+    }
+  };
 
   return (
     <div
@@ -43,9 +75,16 @@ export default function Home() {
             : ""
         }
 
-          <button type='submit' className='bg-violet-500 w-full text-sm text-white px-4 py-2 rounded-md my-2'>Process</button>
-        
+        <button type='submit' className='bg-violet-500 w-full text-sm text-white px-4 py-2 rounded-md my-2'>Process</button>
       </form>
+      <div className='flex flex-col bg-zinc-600 w-1/4 text-sm text-white px-4 py-2 rounded-md'>
+        <h1 className='text-xl font-semibold text-center mt-2 mb-5'>Encrypt File</h1>
+        <div className="m-auto">
+          <input className='bg-zinc-800 outline-none' type="file" name="file" ref={fileInputRef} />
+          <button className='text-center bg-violet-500 text-sm text-white px-2 py-0.5 rounded-r-md' type='button' onClick={handleFileUpload}>Unggah</button>
+        </div>
+        <a className='block m-auto mt-5 bg-violet-500 text-sm text-white px-4 py-2 rounded-md my-2' href="output.txt" download="output.txt">download</a>
+      </div>
     </div>
   )
 }
