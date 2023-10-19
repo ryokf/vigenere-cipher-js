@@ -1,4 +1,5 @@
 import InputField from '@/components/InputField'
+import calculateAvalancheEffect from '@/logic/avallanche';
 import decryptProcess from '@/logic/decrypt';
 import encryptProcess from '@/logic/encrypt'
 import calculateEntropy from '@/logic/entropy';
@@ -9,6 +10,12 @@ import { useRef, useState } from 'react'
 export default function Home() {
   const [result, setResult] = useState('');
   const [isEncrypt, setIsEncrypt] = useState(true);
+
+  const [funcEncrypt, setFuncEncrypt] = useState('')
+  const [funcAvallanche, setFuncAvallanche] = useState('')
+  const [funcEntropy, setFuncEntropy] = useState('')
+  const [funcKey, setFuncKey] = useState('')
+  const [funcPlain, setFuncPlain] = useState('')
 
   const encrypt = (event) => {
     event.preventDefault();
@@ -31,9 +38,29 @@ export default function Home() {
     const reponseKey = await fetch('/api/readKey');
     const key = await reponseKey.json();
 
-    console.log(calculateEntropy(encryptProcess(data.data, key.data).encryptedText));
+    const plainText = data.data;
+    const keyData = key.data;
+    const encryptResult = encryptProcess(data.data, key.data).encryptedText;
+    const entropy = calculateEntropy(encryptResult);
+    const avallanche =  calculateAvalancheEffect(plainText, encryptResult)
+
+    setFuncEncrypt(encryptResult);
+    setFuncAvallanche(avallanche);
+    setFuncEntropy(entropy);
+    setFuncPlain(plainText);
+    setFuncKey(keyData)
+
+    console.log('plain teks : '+plainText);
+    console.log('kunci : '+keyData);
+    console.log('cipher teks : '+encryptResult);
+    console.log('nilai entropi : ' + entropy);
+    console.log('avallanche effect : ' + calculateAvalancheEffect(plainText, encryptResult))
+
+    // console.log(calculateEntropy(encryptProcess(data.data, key.data).encryptedText));
 
     await fetch(`/api/output?encryptedText=${encryptProcess(data.data, 'kunci').encryptedText}`);
+
+    return {plainText, keyData, encryptResult, entropy, avallanche}
   }
 
   encryptFileFunc();
@@ -98,6 +125,10 @@ export default function Home() {
           <button className='text-center bg-violet-500 text-sm text-white px-2 py-0.5 rounded-r-md' type='button'>Unggah</button>
         </div>
         <a className='block m-auto mt-5 bg-violet-500 text-sm text-white px-4 py-2 rounded-md my-2' href="output.txt" download="output.txt">download</a>
+      </div>
+      <div className="text-white p-4">
+        <h1 className='text-white text-xl'>cipher text : </h1>
+        <p className='text-white'>{funcEncrypt}</p>
       </div>
     </div>
   )

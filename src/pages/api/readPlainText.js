@@ -3,7 +3,7 @@
 export default function handler(req, res) {
   const fs = require("fs");
 
-  fs.readFile("public/files.txt", "ascii", (err, data) => {
+  fs.readFile("public/plainText.txt", "ascii", (err, data) => {
     if (err) {
       console.error(err);
       return;
