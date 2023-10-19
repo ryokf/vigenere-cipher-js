@@ -1,6 +1,7 @@
 import InputField from '@/components/InputField'
 import decryptProcess from '@/logic/decrypt';
 import encryptProcess from '@/logic/encrypt'
+import calculateEntropy from '@/logic/entropy';
 import { inter } from '@/theme/theme'
 import { useRef, useState } from 'react'
 
@@ -23,14 +24,19 @@ export default function Home() {
     setResult(decryptProcess(cipherText, key));
   }
 
-  const testAPI = async () => {
-    const response = await fetch('/api/hello');
+  const encryptFileFunc = async () => {
+    const response = await fetch('/api/readPlainText');
     const data = await response.json();
+
+    const reponseKey = await fetch('/api/readKey');
+    const key = await reponseKey.json();
+
+    console.log(calculateEntropy(encryptProcess(data.data, key.data).encryptedText));
 
     await fetch(`/api/output?encryptedText=${encryptProcess(data.data, 'kunci').encryptedText}`);
   }
 
-  testAPI();
+  encryptFileFunc();
 
   const fileInputRef = useRef();
 
@@ -82,6 +88,14 @@ export default function Home() {
         <div className="m-auto">
           <input className='bg-zinc-800 outline-none' type="file" name="file" ref={fileInputRef} />
           <button className='text-center bg-violet-500 text-sm text-white px-2 py-0.5 rounded-r-md' type='button' onClick={handleFileUpload}>Unggah</button>
+        </div>
+        <a className='block m-auto mt-5 bg-violet-500 text-sm text-white px-4 py-2 rounded-md my-2' href="output.txt" download="output.txt">download</a>
+      </div>
+      <div className='flex flex-col bg-zinc-600 w-1/4 text-sm text-white px-4 py-2 rounded-md'>
+        <h1 className='text-xl font-semibold text-center mt-2 mb-5'>Decrypt File</h1>
+        <div className="m-auto">
+          <input className='bg-zinc-800 outline-none' type="file" name="file" />
+          <button className='text-center bg-violet-500 text-sm text-white px-2 py-0.5 rounded-r-md' type='button'>Unggah</button>
         </div>
         <a className='block m-auto mt-5 bg-violet-500 text-sm text-white px-4 py-2 rounded-md my-2' href="output.txt" download="output.txt">download</a>
       </div>
