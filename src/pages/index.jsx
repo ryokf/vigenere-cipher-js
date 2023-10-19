@@ -127,8 +127,16 @@ export default function Home() {
         <a className='block m-auto mt-5 bg-violet-500 text-sm text-white px-4 py-2 rounded-md my-2' href="output.txt" download="output.txt">download</a>
       </div>
       <div className="text-white p-4">
+        <h1 className='text-white text-xl'>plain text : </h1>
+        <p className='text-white'>{funcPlain}</p>
+        <h1 className='text-white text-xl'>key : </h1>
+        <p className='text-white'>{funcKey}</p>
         <h1 className='text-white text-xl'>cipher text : </h1>
         <p className='text-white'>{funcEncrypt}</p>
+        <h1 className='text-white text-xl'>entropi : </h1> 
+        <p className='text-white'>{funcEntropy}</p>
+        <h1 className='text-white text-xl'>avallanche : </h1> 
+        <p className='text-white'>{funcAvallanche}</p>
       </div>
     </div>
   )
